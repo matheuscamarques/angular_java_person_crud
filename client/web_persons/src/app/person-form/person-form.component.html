@@ -1,0 +1,109 @@
+<div class="max-w-4xl mx-auto">
+  <!-- Cabeçalho -->
+  <header class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold text-slate-800">{{ pageTitle() }}</h1>
+    <button (click)="goBack()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">
+      &larr; Voltar
+    </button>
+  </header>
+
+  <!-- Indicador de Carregamento -->
+  @if (isLoading()) {
+    <div class="flex justify-center items-center p-10">
+      <div class="w-12 h-12 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>
+    </div>
+  }
+
+  <!-- Formulário -->
+  @if (!isLoading()) {
+    <form [formGroup]="personForm" (ngSubmit)="savePerson()" novalidate class="bg-white p-6 sm:p-8 rounded-lg shadow-md border border-slate-200 space-y-6">
+
+      <!-- Alerta de Erro -->
+      @if (error()) {
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md relative" role="alert">
+          <strong class="font-bold">Erro!</strong>
+          <span class="block sm:inline ml-2">{{ error() }}</span>
+        </div>
+      }
+
+      <!-- Grid de Campos -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Campo Nome -->
+        <div class="md:col-span-2">
+          <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nome Completo</label>
+          <input type="text" id="name" formControlName="name" class="form-input" [class.border-red-500]="personForm.get('name')?.invalid && personForm.get('name')?.touched">
+          @if (personForm.get('name')?.invalid && personForm.get('name')?.touched) {
+            <p class="text-xs text-red-600 mt-1">Nome é obrigatório (mínimo 3 caracteres).</p>
+          }
+        </div>
+
+        <!-- Campo E-mail -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-700 mb-1">E-mail</label>
+          <input type="email" id="email" formControlName="email" class="form-input" [class.border-red-500]="personForm.get('email')?.invalid && personForm.get('email')?.touched">
+          @if (personForm.get('email')?.invalid && personForm.get('email')?.touched) {
+            <p class="text-xs text-red-600 mt-1">Por favor, insira um e-mail válido.</p>
+          }
+        </div>
+
+        <!-- Campo Telefone -->
+        <div>
+          <label for="phone" class="block text-sm font-medium text-slate-700 mb-1">Telefone (Opcional)</label>
+          <input type="tel" id="phone" formControlName="phone" class="form-input">
+        </div>
+
+        <!-- Campo Data de Nascimento -->
+        <div>
+          <label for="birthDate" class="block text-sm font-medium text-slate-700 mb-1">Data de Nascimento</label>
+          <input type="date" id="birthDate" formControlName="birthDate" class="form-input" [class.border-red-500]="personForm.get('birthDate')?.invalid && personForm.get('birthDate')?.touched">
+           @if (personForm.get('birthDate')?.invalid && personForm.get('birthDate')?.touched) {
+            <p class="text-xs text-red-600 mt-1">Data de nascimento é obrigatória.</p>
+          }
+        </div>
+
+        <!-- Campo Status -->
+        <div>
+          <label for="status" class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+          <select id="status" formControlName="status" class="form-input bg-white">
+            @for(status of personStatusOptions; track status) {
+              <option [value]="status">{{ status | titlecase }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Campo Saldo -->
+        <div>
+          <label for="balance" class="block text-sm font-medium text-slate-700 mb-1">Saldo</label>
+          <input type="number" id="balance" formControlName="balance" class="form-input" [class.border-red-500]="personForm.get('balance')?.invalid && personForm.get('balance')?.touched">
+          @if (personForm.get('balance')?.invalid && personForm.get('balance')?.touched) {
+            <p class="text-xs text-red-600 mt-1">Saldo é obrigatório e não pode ser negativo.</p>
+          }
+        </div>
+
+        <!-- Campo Moeda -->
+        <div>
+          <label for="currency" class="block text-sm font-medium text-slate-700 mb-1">Moeda</label>
+          <input type="text" id="currency" formControlName="currency" class="form-input" [class.border-red-500]="personForm.get('currency')?.invalid && personForm.get('currency')?.touched">
+           @if (personForm.get('currency')?.invalid && personForm.get('currency')?.touched) {
+            <p class="text-xs text-red-600 mt-1">Moeda é obrigatória.</p>
+          }
+        </div>
+      </div>
+
+      <!-- Botões de Ação -->
+      <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+        <button type="button" (click)="goBack()" class="btn btn-secondary">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="isLoading()" class="btn btn-primary disabled:opacity-50 disabled:cursor-wait">
+          @if (isEditing()) {
+            <span>Salvar Alterações</span>
+          } @else {
+            <span>Criar Pessoa</span>
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

@@ -1,0 +1,85 @@
+<!-- O layout principal que centraliza o conteúdo -->
+<div class="max-w-4xl mx-auto">
+
+  <!-- Indicador de Carregamento -->
+  @if (isLoading()) {
+    <div class="flex justify-center items-center p-10">
+      <div class="w-12 h-12 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>
+    </div>
+  }
+
+  <!-- Mensagem de Erro -->
+  @if (error()) {
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-800 p-4 rounded-md" role="alert">
+      <p class="font-bold">Ocorreu um erro</p>
+      <p>{{ error() }}</p>
+      <a routerLink="/persons" class="mt-4 inline-block bg-red-600 text-white font-bold py-2 px-4 rounded hover:bg-red-700 transition-colors">
+        Voltar para a Lista
+      </a>
+    </div>
+  }
+
+  <!-- Card de Detalhes da Pessoa -->
+  @if (person(); as p) {
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-slate-200">
+      
+      <!-- Cabeçalho do Card -->
+      <div class="p-6 border-b border-slate-200">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-3xl font-bold text-slate-800">{{ p.name }}</h1>
+            <p class="text-md text-slate-500">{{ p.email }}</p>
+          </div>
+          <span [ngClass]="getStatusClass(p.status)" class="px-3 py-1 text-sm font-semibold rounded-full uppercase tracking-wider">
+            {{ p.status }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Corpo com os Detalhes -->
+      <div class="p-6">
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+          
+          <div>
+            <dt class="text-sm font-medium text-slate-500">Telefone</dt>
+            <dd class="mt-1 text-lg text-slate-900">{{ p.phone || 'Não informado' }}</dd>
+          </div>
+          
+          <div>
+            <dt class="text-sm font-medium text-slate-500">Data de Nascimento</dt>
+            <dd class="mt-1 text-lg text-slate-900">{{ p.birthDate | date:'dd/MM/yyyy' }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-medium text-slate-500">Saldo</dt>
+            <dd class="mt-1 text-lg font-semibold text-green-700">
+              <!-- O pipe 'currency' usa o 'pt-BR' que configuramos no app.config.ts -->
+              {{ p.balance | currency:p.currency:'symbol':'1.2-2' }}
+            </dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-medium text-slate-500">Moeda</dt>
+            <dd class="mt-1 text-lg text-slate-900">{{ p.currency }}</dd>
+          </div>
+
+          <div class="sm:col-span-2 border-t border-slate-200 pt-8">
+            <dt class="text-sm font-medium text-slate-500">Criado em</dt>
+            <dd class="mt-1 text-lg text-slate-900">{{ p.createdAt | date:'dd/MM/yyyy, HH:mm:ss' }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-medium text-slate-500">Última Atualização</dt>
+            <dd class="mt-1 text-lg text-slate-900">{{ p.updatedAt | date:'dd/MM/yyyy, HH:mm:ss' }}</dd>
+          </div>
+
+        </dl>
+      </div>
+
+      <!-- Rodapé com Ações -->
+      <div class="px-6 py-4 bg-slate-50 text-right">
+        <a routerLink="/persons" class="btn btn-secondary">Voltar para a Lista</a>
+      </div>
+    </div>
+  }
+</div>

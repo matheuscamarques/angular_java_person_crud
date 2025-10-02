@@ -1,0 +1,141 @@
+<!-- Cabeçalho da Página (sem alterações) -->
+<header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+  <div>
+    <h1 class="text-3xl font-bold text-slate-800">Gerenciador de Pessoas</h1>
+    <p class="text-slate-500 mt-1">Visualize, filtre e gerencie os registros.</p>
+  </div>
+  <a [routerLink]="['/person/new']" class="flex items-center gap-2 bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+    </svg>
+    Nova Pessoa
+  </a>
+</header>
+
+<!-- Seção de Filtros -->
+<div class="bg-white p-4 rounded-lg shadow-sm mb-6 border border-slate-200">
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+    <!-- Filtro por Nome -->
+    <div class="flex flex-col">
+      <label for="name" class="text-sm font-medium text-slate-600 mb-1">Nome</label>
+      <input type="text" id="name" formControlName="name" placeholder="Pesquisar por nome..." class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+    </div>
+
+    <!-- ALTERADO: Seção de Status trocada por E-mail -->
+    <div class="flex flex-col">
+      <label for="email" class="text-sm font-medium text-slate-600 mb-1">E-mail</label>
+      <input type="email" id="email" formControlName="email" placeholder="Pesquisar por e-mail..." class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="flex gap-2 md:col-span-2 justify-self-end w-full">
+      <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">Filtrar</button>
+      <button type="button" (click)="resetFilters()" class="w-full bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-md hover:bg-slate-300 transition-colors">Limpar</button>
+    </div>
+  </form>
+</div>
+
+<!-- O restante do template (tabela, paginação, modal) permanece o mesmo -->
+@if (isLoading()) {
+  <div class="flex justify-center items-center p-10">
+    <div class="w-12 h-12 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>
+  </div>
+} @else {
+  @if (error()) {
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6" role="alert">
+      <p class="font-bold">Ocorreu um Erro</p>
+      <p>{{ error() }}</p>
+    </div>
+  }
+
+  @if (persons().length > 0) {
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-200">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-slate-600">
+          <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+            <tr>
+              <th scope="col" class="px-6 py-3">Nome</th>
+              <th scope="col" class="px-6 py-3">Status</th>
+              <th scope="col" class="px-6 py-3">Data de Nasc.</th>
+              <th scope="col" class="px-6 py-3">Saldo</th>
+              <th scope="col" class="px-6 py-3 text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (person of persons(); track person.id) {
+              <tr class="bg-white border-b hover:bg-slate-50">
+                <td class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">
+                  <div>{{ person.name }}</div>
+                  <div class="text-xs text-slate-500">{{ person.email }}</div>
+                </td>
+                <td class="px-6 py-4">
+                  <span [ngClass]="getStatusClass(person.status)">{{ person.status | titlecase }}</span>
+                </td>
+                <td class="px-6 py-4">{{ person.birthDate | date:'dd/MM/yyyy' }}</td>
+                <td class="px-6 py-4 font-mono">{{ person.balance }}</td>
+                <td class="px-6 py-4">
+                  <div class="flex justify-center items-center gap-2">
+                    <a [routerLink]="['/person/details', person.id]" class="p-2 text-slate-500 hover:text-indigo-600" title="Detalhes">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/><path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/></svg>
+                    </a>
+                    <a [routerLink]="['/person', person.id]" class="p-2 text-slate-500 hover:text-blue-600" title="Editar">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/></svg>
+                    </a>
+                    <button (click)="personToDelete.set(person)" class="p-2 text-slate-500 hover:text-red-600" title="Excluir">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (totalPages() > 1) {
+      <nav class="flex items-center justify-between pt-4" aria-label="Table navigation">
+        <span class="text-sm font-normal text-slate-500">
+          Exibindo <span class="font-semibold text-slate-900">{{ (currentPage() * pageSize()) + 1 }}-{{ (currentPage() * pageSize()) + persons().length }}</span> de <span class="font-semibold text-slate-900">{{ totalElements() }}</span>
+        </span>
+        <ul class="inline-flex -space-x-px text-sm h-8">
+          <li>
+            <button (click)="changePage(currentPage() - 1)" [disabled]="currentPage() === 0" class="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-slate-500 bg-white border border-slate-300 rounded-l-lg hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed">
+              Anterior
+            </button>
+          </li>
+          <li>
+            <button (click)="changePage(currentPage() + 1)" [disabled]="currentPage() >= totalPages() - 1" class="flex items-center justify-center px-3 h-8 leading-tight text-slate-500 bg-white border border-slate-300 rounded-r-lg hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed">
+              Próxima
+            </button>
+          </li>
+        </ul>
+      </nav>
+    }
+  } @else {
+    <div class="text-center p-8 bg-white rounded-lg shadow-sm border border-slate-200">
+      <h3 class="text-xl font-semibold text-slate-700">Nenhuma pessoa encontrada</h3>
+      <p class="text-slate-500 mt-2">Tente ajustar os filtros ou adicione uma nova pessoa.</p>
+    </div>
+  }
+}
+
+@if (personToDelete(); as person) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" (click)="cancelDelete()">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4" (click)="$event.stopPropagation()">
+      <h3 class="text-xl font-bold text-slate-800">Confirmar Exclusão</h3>
+      <p class="mt-2 text-slate-600">
+        Você tem certeza que deseja excluir <strong>{{ person.name }}</strong>? Esta ação não pode ser desfeita.
+      </p>
+      <div class="mt-6 flex justify-end gap-3">
+        <button (click)="cancelDelete()" class="px-4 py-2 bg-slate-200 text-slate-800 font-semibold rounded-md hover:bg-slate-300">
+          Cancelar
+        </button>
+        <button (click)="confirmDelete()" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700">
+          Confirmar Exclusão
+        </button>
+      </div>
+    </div>
+  </div>
+}
+

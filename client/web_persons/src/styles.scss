@@ -1,1 +1,40 @@
-/* You can add global styles to this file, and also import other style files */
+/* Importações padrão do Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * =================================================================================
+ * COMPONENTES PERSONALIZADOS DA APLICAÇÃO
+ * =================================================================================
+ */
+@layer components {
+  /*
+  * Estilo base para todos os inputs, textareas e selects
+  * Define borda, padding, sombra, cantos arredondados e um estado de foco claro.
+  */
+  .form-input {
+    @apply block w-full rounded-md border-slate-300 bg-slate-50 shadow-sm transition-colors duration-200 ease-in-out;
+    @apply focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50;
+  }
+
+  /*
+  * Estilo base para botões
+  * Define formatação de texto, padding, cantos e efeitos de transição/foco.
+  */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-150 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  /* Variação de botão primário (para ações principais) */
+  .btn-primary {
+    @apply bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500;
+  }
+
+  /* Variação de botão secundário (para ações de cancelamento) */
+  .btn-secondary {
+    @apply bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus:ring-indigo-500;
+  }
+}
